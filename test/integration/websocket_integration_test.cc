@@ -21,13 +21,13 @@ namespace {
 
 Http::TestRequestHeaderMapImpl upgradeRequestHeaders(const char* upgrade_type = "websocket",
                                                      uint32_t content_length = 0) {
-  return Http::TestHeaderMapImpl{{":authority", "host"},
-                                 {"content-length", fmt::format("{}", content_length)},
-                                 {":path", "/websocket/test"},
-                                 {":method", "GET"},
-                                 {":scheme", "http"},
-                                 {"upgrade", upgrade_type},
-                                 {"connection", "keep-alive, upgrade"}};
+  return Http::TestRequestHeaderMapImpl{{":authority", "host"},
+                                        {"content-length", fmt::format("{}", content_length)},
+                                        {":path", "/websocket/test"},
+                                        {":method", "GET"},
+                                        {":scheme", "http"},
+                                        {"upgrade", upgrade_type},
+                                        {"connection", "keep-alive, upgrade"}};
 }
 
 Http::TestResponseHeaderMapImpl upgradeResponseHeaders(const char* upgrade_type = "websocket") {
@@ -40,9 +40,9 @@ Http::TestResponseHeaderMapImpl upgradeResponseHeaders(const char* upgrade_type 
 } // namespace
 
 void WebsocketIntegrationTest::validateUpgradeRequestHeaders(
-    const Http::HeaderMap& original_proxied_request_headers,
-    const Http::HeaderMap& original_request_headers) {
-  Http::TestHeaderMapImpl proxied_request_headers(original_proxied_request_headers);
+    const Http::RequestHeaderMap& original_proxied_request_headers,
+    const Http::RequestHeaderMap& original_request_headers) {
+  Http::TestRequestHeaderMapImpl proxied_request_headers(original_proxied_request_headers);
   if (proxied_request_headers.ForwardedProto()) {
     ASSERT_EQ(proxied_request_headers.ForwardedProto()->value().getStringView(), "http");
     proxied_request_headers.removeForwardedProto();
@@ -66,8 +66,8 @@ void WebsocketIntegrationTest::validateUpgradeRequestHeaders(
 }
 
 void WebsocketIntegrationTest::validateUpgradeResponseHeaders(
-    const Http::HeaderMap& original_proxied_response_headers,
-    const Http::HeaderMap& original_response_headers) {
+    const Http::ResponseHeaderMap& original_proxied_response_headers,
+    const Http::ResponseHeaderMap& original_response_headers) {
   Http::TestHeaderMapImpl proxied_response_headers(original_proxied_response_headers);
 
   // Check for and remove headers added by default for HTTP responses.

@@ -204,7 +204,7 @@ bool JsonTranscoderConfig::matchIncomingRequestInfo() const {
 bool JsonTranscoderConfig::convertGrpcStatus() const { return convert_grpc_status_; }
 
 ProtobufUtil::Status JsonTranscoderConfig::createTranscoder(
-    const Http::HeaderMap& headers, ZeroCopyInputStream& request_input,
+    const Http::RequestHeaderMap& headers, ZeroCopyInputStream& request_input,
     google::grpc::transcoding::TranscoderInputStream& response_input,
     std::unique_ptr<Transcoder>& transcoder, const Protobuf::MethodDescriptor*& method_descriptor) {
   if (Grpc::Common::hasGrpcContentType(headers)) {
@@ -537,8 +537,8 @@ bool JsonTranscoderFilter::readToBuffer(Protobuf::io::ZeroCopyInputStream& strea
   return false;
 }
 
-void JsonTranscoderFilter::buildResponseFromHttpBodyOutput(Http::HeaderMap& response_headers,
-                                                           Buffer::Instance& data) {
+void JsonTranscoderFilter::buildResponseFromHttpBodyOutput(
+    Http::ResponseHeaderMap& response_headers, Buffer::Instance& data) {
   std::vector<Grpc::Frame> frames;
   decoder_.decode(data, frames);
   if (frames.empty()) {

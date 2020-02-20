@@ -128,8 +128,8 @@ public:
   }
 
   void sendRateLimitResponse(envoy::service::ratelimit::v3::RateLimitResponse::Code code,
-                             const Http::HeaderMap& response_headers_to_add,
-                             const Http::HeaderMap& request_headers_to_add) {
+                             const Http::ResponseHeaderMap& response_headers_to_add,
+                             const Http::RequestHeaderMap& request_headers_to_add) {
     ratelimit_request_->startGrpcStream();
     envoy::service::ratelimit::v3::RateLimitResponse response_msg;
     response_msg.set_overall_code(code);
@@ -175,7 +175,7 @@ public:
     initiateClientConnection();
     waitForRatelimitRequest();
     sendRateLimitResponse(envoy::service::ratelimit::v3::RateLimitResponse::OK,
-                          Http::HeaderMapImpl{}, Http::HeaderMapImpl{});
+                          Http::ResponseHeaderMapImpl{}, Http::RequestHeaderMapImpl{});
     waitForSuccessfulUpstreamResponse();
     cleanup();
 
@@ -214,8 +214,8 @@ TEST_P(RatelimitIntegrationTest, Ok) { basicFlow(); }
 TEST_P(RatelimitIntegrationTest, OkWithHeaders) {
   initiateClientConnection();
   waitForRatelimitRequest();
-  Http::TestHeaderMapImpl ratelimit_response_headers{{"x-ratelimit-limit", "1000"},
-                                                     {"x-ratelimit-remaining", "500"}};
+  Http::TestResponseHeaderMapImpl ratelimit_response_headers{{"x-ratelimit-limit", "1000"},
+                                                             {"x-ratelimit-remaining", "500"}};
   Http::TestRequestHeaderMapImpl request_headers_to_add{{"x-ratelimit-done", "true"}};
 
   sendRateLimitResponse(envoy::service::ratelimit::v3::RateLimitResponse::OK,
